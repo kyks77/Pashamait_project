@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — novo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="logo"><span class="logo-mark"></span>novo</a>
+  <div class="nav-links" id="nav-auth"></div>
+</nav>
+
+<main class="page-wrap">
+  <div class="profile-header">
+    <div class="avatar" id="avatar">?</div>
+    <div>
+      <h1 style="font-size:1.5rem;margin:0;" id="display-name">Profile</h1>
+      <p style="color:var(--muted);margin:4px 0 0;" id="user-email"></p>
+      <span id="sub-badge" class="badge badge-muted">Loading…</span>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <section class="card">
+      <h2 style="font-size:1.1rem;margin-top:0;">Account settings</h2>
+      <div id="profile-msg" class="form-success" style="display:none;"></div>
+      <div id="profile-err" class="form-error" style="display:none;"></div>
+
+      <form id="profile-form">
+        <label class="full">Display name
+          <input type="text" name="displayName">
+        </label>
+        <label class="full">Email
+          <input type="email" name="email">
+        </label>
+        <label class="full">Current password <span style="font-weight:400;">(required to change password)</span>
+          <input type="password" name="currentPassword" autocomplete="current-password">
+        </label>
+        <label class="full">New password
+          <input type="password" name="newPassword" autocomplete="new-password" placeholder="Leave blank to keep current">
+        </label>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </form>
+    </section>
+
+    <section class="card" id="subscribe">
+      <h2 style="font-size:1.1rem;margin-top:0;">Subscription</h2>
+      <p style="color:var(--muted);font-size:0.92rem;" id="sub-details"></p>
+
+      <div class="pricing-cards" style="margin-top:16px;" id="plan-actions">
+        <div class="pricing-card">
+          <div class="price">$9</div>
+          <div class="period">/ month</div>
+          <button class="btn btn-secondary btn-full" style="margin-top:12px;" data-plan="monthly">Choose monthly</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="price">$79</div>
+          <div class="period">/ year</div>
+          <button class="btn btn-primary btn-full" style="margin-top:12px;" data-plan="yearly">Choose yearly</button>
+        </div>
+      </div>
+      <button id="cancel-sub" class="btn btn-secondary" style="margin-top:16px;display:none;">Cancel subscription</button>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:24px;">
+    <h2 style="font-size:1.1rem;margin-top:0;">Quick links</h2>
+    <p style="color:var(--muted);font-size:0.92rem;">
+      <a href="generate.html">Open document generator →</a><br>
+      Default freelancer details can be saved here in a future update.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <p><span class="logo"><span class="logo-mark"></span>novo</span> · © 2026</p>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+let currentUser = null;
+
+async function loadProfile() {
+  currentUser = await window.novoAuth.requireAuth();
+  if (!currentUser) return;
+
+  const name = currentUser.displayName || currentUser.email.split('@')[0];
+  document.getElementById('display-name').textContent = name;
+  document.getElementById('user-email').textContent = currentUser.email;
+  document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+  document.querySelector('[name="displayName"]').value = currentUser.displayName || '';
+  document.querySelector('[name="email"]').value = currentUser.email;
+
+  const badge = document.getElementById('sub-badge');
+  const details = document.getElementById('sub-details');
+  const cancelBtn = document.getElementById('cancel-sub');
+  const planActions = document.getElementById('plan-actions');
+
+  if (currentUser.role === 'admin') {
+    badge.textContent = 'Admin — full access';
+    badge.className = 'badge badge-ok';
+    details.textContent = 'Admin accounts have unlimited access to all features.';
+    planActions.style.display = 'none';
+  } else if (currentUser.hasActiveSubscription) {
+    badge.textContent = 'Active';
+    badge.className = 'badge badge-ok';
+    const exp = currentUser.subscription.expiresAt
+      ? new Date(currentUser.subscription.expiresAt).toLocaleDateString()
+      : '—';
+    details.textContent = `${currentUser.subscription.plan || 'Active'} plan · Renews/expires ${exp}`;
+    cancelBtn.style.display = '';
+    planActions.style.display = 'none';
+  } else {
+    badge.textContent = 'No active plan';
+    badge.className = 'badge badge-warn';
+    details.textContent = 'Subscribe to generate watermark-free PDFs and unlock full access.';
+    cancelBtn.style.display = 'none';
+  }
+}
+
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const msg = document.getElementById('profile-msg');
+  const err = document.getElementById('profile-err');
+  msg.style.display = err.style.display = 'none';
+  try {
+    const body = {
+      displayName: fd.get('displayName'),
+      email: fd.get('email')
+    };
+    if (fd.get('newPassword')) {
+      body.currentPassword = fd.get('currentPassword');
+      body.newPassword = fd.get('newPassword');
+    }
+    const { user } = await window.novoApi.updateProfile(body);
+    currentUser = user;
+    msg.textContent = 'Profile updated.';
+    msg.style.display = 'block';
+    loadProfile();
+    window.novoAuth.renderNav(user);
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.style.display = 'block';
+  }
+});
+
+document.querySelectorAll('[data-plan]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    if (!confirm(`Activate ${btn.dataset.plan} subscription? (Demo mode — wire Stripe for production payments.)`)) return;
+    try {
+      await window.novoApi.activateSubscription(btn.dataset.plan);
+      const { user } = await window.novoApi.me();
+      currentUser = user;
+      loadProfile();
+    } catch (ex) {
+      alert(ex.message);
+    }
+  });
+});
+
+document.getElementById('cancel-sub')?.addEventListener('click', async () => {
+  if (!confirm('Cancel subscription? Access continues until expiry.')) return;
+  await window.novoApi.cancelSubscription();
+  const { user } = await window.novoApi.me();
+  currentUser = user;
+  loadProfile();
+});
+
+loadProfile();
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account — novo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="logo"><span class="logo-mark"></span>novo</a>
+  <div class="nav-links" id="nav-auth"></div>
+</nav>
+
+<main class="auth-card card">
+  <h2>Create your account</h2>
+  <div id="error" class="form-error" style="display:none;"></div>
+
+  <form id="register-form">
+    <label class="full">Display name
+      <input type="text" name="displayName" placeholder="Alex Morgan" autocomplete="name">
+    </label>
+    <label class="full">Email
+      <input type="email" name="email" required autocomplete="email">
+    </label>
+    <label class="full">Password
+      <input type="password" name="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
+    </label>
+    <button type="submit" class="btn btn-primary btn-full">Create account</button>
+  </form>
+
+  <p class="form-footer">Already have an account? <a href="login.html">Sign in</a></p>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+window.novoAuth.initNav();
+
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const errEl = document.getElementById('error');
+  errEl.style.display = 'none';
+  try {
+    await window.novoApi.register(fd.get('email'), fd.get('password'), fd.get('displayName'));
+    window.location.href = 'profile.html#subscribe';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

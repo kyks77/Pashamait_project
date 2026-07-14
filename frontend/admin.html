@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — novo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="logo"><span class="logo-mark"></span>novo</a>
+  <div class="nav-links" id="nav-auth"></div>
+</nav>
+
+<main class="page-wrap wide">
+  <h1 style="font-size:1.6rem;">Admin dashboard</h1>
+  <p style="color:var(--muted);">Monitor users, subscriptions, and halt suspicious activity.</p>
+
+  <div class="admin-stats" id="stats">
+    <div class="stat-card"><div class="num" id="stat-users">—</div><div class="label">Total users</div></div>
+    <div class="stat-card"><div class="num" id="stat-subs">—</div><div class="label">Active subscriptions</div></div>
+    <div class="stat-card"><div class="num" id="stat-suspended">—</div><div class="label">Suspended</div></div>
+  </div>
+
+  <section class="card" style="margin-bottom:24px;">
+    <h2 style="font-size:1rem;margin-top:0;">Users</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Subscription</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="font-size:1rem;margin-top:0;">Recent activity</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Details</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="activity-table"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p><span class="logo"><span class="logo-mark"></span>novo</span> · Admin</p>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+async function init() {
+  const user = await window.novoAuth.requireAuth();
+  if (!user || user.role !== 'admin') {
+    window.location.href = 'index.html';
+    return;
+  }
+  window.novoAuth.renderNav(user);
+  await loadDashboard();
+}
+
+async function loadDashboard() {
+  const [stats, usersData, activityData] = await Promise.all([
+    window.novoApi.adminStats(),
+    window.novoApi.adminUsers(),
+    window.novoApi.adminActivity(40)
+  ]);
+
+  document.getElementById('stat-users').textContent = stats.totalUsers;
+  document.getElementById('stat-subs').textContent = stats.activeSubscriptions;
+  document.getElementById('stat-suspended').textContent = stats.suspendedAccounts;
+
+  const tbody = document.getElementById('users-table');
+  tbody.innerHTML = usersData.users.map(u => `
+    <tr>
+      <td>${escapeHtml(u.email)}</td>
+      <td>${escapeHtml(u.displayName || '—')}</td>
+      <td><span class="badge ${u.status === 'active' ? 'badge-ok' : 'badge-warn'}">${u.status}</span></td>
+      <td>${u.subscription.status}${u.subscription.plan ? ' (' + u.subscription.plan + ')' : ''}</td>
+      <td class="action-btns">
+        ${u.status === 'active'
+          ? `<button class="btn btn-small btn-danger" data-action="suspend" data-id="${u.id}">Suspend</button>`
+          : `<button class="btn btn-small btn-secondary" data-action="activate" data-id="${u.id}">Restore</button>`}
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const status = btn.dataset.action === 'suspend' ? 'suspended' : 'active';
+      const label = status === 'suspended' ? 'Suspend this user?' : 'Restore this user?';
+      if (!confirm(label)) return;
+      await window.novoApi.adminSetStatus(btn.dataset.id, status);
+      loadDashboard();
+    });
+  });
+
+  document.getElementById('activity-table').innerHTML = activityData.activity.map(a => `
+    <tr>
+      <td>${new Date(a.created_at).toLocaleString()}</td>
+      <td>${escapeHtml(a.email || a.user_id || '—')}</td>
+      <td>${escapeHtml(a.action)}</td>
+      <td>${escapeHtml(a.details || '—')}</td>
+      <td>${escapeHtml(a.ip_address || '—')}</td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generate — novo</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="logo"><span class="logo-mark"></span>novo</a>
+  <div class="nav-links" id="nav-auth"></div>
+</nav>
+
+<main class="page-wrap wide">
+  <h1 style="font-size:1.8rem;margin-bottom:8px;">Generate your document</h1>
+  <p style="color:var(--muted);margin-bottom:24px;">Contracts, invoices, and proposals — configured your way.</p>
+
+  <div id="status-bar" class="status-bar">Checking subscription…</div>
+
+  <div class="tabs">
+    <button class="tab active" data-tpl="contract">Contract</button>
+    <button class="tab" data-tpl="invoice">Invoice</button>
+    <button class="tab" data-tpl="proposal">Proposal</button>
+  </div>
+
+  <form id="doc-form" class="card">
+    <div class="options-section">
+      <h3>Parties & project</h3>
+      <div class="form-grid">
+        <label>Your name / business *
+          <input type="text" name="freelancerName" required placeholder="Alex Morgan">
+        </label>
+        <label>Your email *
+          <input type="email" name="freelancerEmail" required placeholder="alex@studio.co">
+        </label>
+        <label>Client name / company *
+          <input type="text" name="clientName" required placeholder="Acme Inc.">
+        </label>
+        <label>Client email
+          <input type="email" name="clientEmail" placeholder="hello@acme.com">
+        </label>
+        <label>Project name *
+          <input type="text" name="projectName" required placeholder="Website redesign">
+        </label>
+        <label>Start date *
+          <input type="date" name="startDate" required>
+        </label>
+        <label>Deadline / due date
+          <input type="date" name="endDate">
+        </label>
+        <label>Total amount *
+          <input type="number" name="amount" required placeholder="1500" min="0" step="0.01">
+        </label>
+        <label>Currency
+          <select name="currency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="KZT">KZT</option>
+          </select>
+        </label>
+      </div>
+      <label class="full">Project scope / description
+        <textarea name="scope" rows="3" placeholder="Design and build a 5-page responsive site with 2 revision rounds…"></textarea>
+      </label>
+    </div>
+
+    <div class="options-section">
+      <h3>Payment & billing</h3>
+      <div class="form-grid">
+        <label>Payment structure
+          <select name="paymentTerms">
+            <option value="50/50">50% upfront, 50% on delivery</option>
+            <option value="10/90">10% upfront, 90% after submission</option>
+            <option value="30/70">30% upfront, 70% on delivery</option>
+            <option value="40/60">40% upfront, 60% on delivery</option>
+            <option value="25/25/50">25% / 25% / 50% milestones</option>
+            <option value="33/33/34">Three equal milestones</option>
+            <option value="100_upfront">100% upfront</option>
+            <option value="100_delivery">100% on delivery</option>
+            <option value="monthly">Monthly retainer (net 15)</option>
+            <option value="hourly">Hourly billing</option>
+            <option value="retainer">Fixed monthly retainer</option>
+            <option value="custom">Custom schedule</option>
+          </select>
+        </label>
+        <label id="customPaymentWrap" style="display:none;">Custom payment terms
+          <input type="text" name="customPaymentTerms" placeholder="e.g. 15% deposit, 85% within 14 days of launch">
+        </label>
+        <label>Late payment policy
+          <select name="lateFeePolicy">
+            <option value="5">5% late fee after 15 days</option>
+            <option value="10">10% late fee after 15 days</option>
+            <option value="1.5_monthly">1.5% monthly interest</option>
+            <option value="pause_work">Pause work until paid</option>
+            <option value="none">No late fee (pause only)</option>
+          </select>
+        </label>
+        <label>Rush / expedited delivery
+          <select name="rushFee">
+            <option value="no">Standard timeline</option>
+            <option value="yes">Rush fee applies</option>
+          </select>
+        </label>
+        <label>Rush fee percentage
+          <input type="number" name="rushPercent" placeholder="25" min="0" max="100">
+        </label>
+      </div>
+    </div>
+
+    <div class="options-section">
+      <h3>Revisions & scope</h3>
+      <div class="form-grid">
+        <label>Revision policy
+          <select name="revisionPolicy">
+            <option value="2">2 rounds included</option>
+            <option value="1">1 round included</option>
+            <option value="3">3 rounds included</option>
+            <option value="unlimited">Unlimited (within scope)</option>
+            <option value="hourly_after">2 rounds, then hourly</option>
+          </select>
+        </label>
+        <label id="hourlyRateWrap" style="display:none;">Hourly rate (extra revisions)
+          <input type="text" name="hourlyRate" placeholder="$75/hr">
+        </label>
+        <label>Scope change policy
+          <select name="scopeChangePolicy">
+            <option value="written_change_order">Written change order required</option>
+            <option value="hourly_extra">Billed hourly with approval</option>
+            <option value="fixed_adjustment">Fixed fee quote for changes</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="options-section">
+      <h3>Legal & working terms</h3>
+      <div class="form-grid three">
+        <label>IP ownership
+          <select name="ipOwnership">
+            <option value="full_transfer">Full transfer on payment</option>
+            <option value="license">Client license, you retain ownership</option>
+            <option value="shared">Shared ownership</option>
+            <option value="work_for_hire">Work for hire</option>
+          </select>
+        </label>
+        <label>Confidentiality
+          <select name="confidentiality">
+            <option value="standard">Standard</option>
+            <option value="nda">Strict NDA level</option>
+            <option value="minimal">Minimal / portfolio-friendly</option>
+          </select>
+        </label>
+        <label>Termination notice
+          <select name="terminationNotice">
+            <option value="7">7 days</option>
+            <option value="14">14 days</option>
+            <option value="30">30 days</option>
+          </select>
+        </label>
+        <label>Warranty period
+          <select name="warranty">
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+            <option value="none">No warranty</option>
+          </select>
+        </label>
+        <label>Communication
+          <select name="communication">
+            <option value="email">Email (2 business days)</option>
+            <option value="slack">Slack / chat (1 business day)</option>
+            <option value="weekly_call">Weekly call + email</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <label class="full">Additional notes
+      <textarea name="notes" rows="2" placeholder="Extra clauses, deliverable list, tools used…"></textarea>
+    </label>
+
+    <button type="submit" class="btn btn-primary btn-full">Generate PDF</button>
+  </form>
+
+  <p class="disclaimer">Generated templates are for convenience, not legal advice. Consult a licensed attorney for high-value or complex engagements.</p>
+</main>
+
+<footer>
+  <p><span class="logo"><span class="logo-mark"></span>novo</span> · © 2026</p>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/templates.js"></script>
+<script src="js/generate.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — novo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="logo"><span class="logo-mark"></span>novo</a>
+  <div class="nav-links" id="nav-auth"></div>
+</nav>
+
+<main class="auth-card card">
+  <h2>Welcome back</h2>
+  <div id="error" class="form-error" style="display:none;"></div>
+
+  <form id="login-form">
+    <label class="full">Email
+      <input type="email" name="email" required autocomplete="email">
+    </label>
+    <label class="full">Password
+      <input type="password" name="password" required autocomplete="current-password">
+    </label>
+    <button type="submit" class="btn btn-primary btn-full">Sign in</button>
+  </form>
+
+  <p class="form-footer">No account? <a href="register.html">Create one</a></p>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+window.novoAuth.initNav();
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const errEl = document.getElementById('error');
+  errEl.style.display = 'none';
+  try {
+    await window.novoApi.login(fd.get('email'), fd.get('password'));
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('next') || 'generate.html';
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

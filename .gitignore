@@ -1,0 +1,6 @@
+node_modules/
+backend/.env
+backend/db/novo.db
+backend/db/novo.db-*
+.env
+.DS_Store
