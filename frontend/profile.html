@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile — novo</title>
+<title>Profile - novo</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
     <div>
       <h1 style="font-size:1.5rem;margin:0;" id="display-name">Profile</h1>
       <p style="color:var(--muted);margin:4px 0 0;" id="user-email"></p>
-      <span id="sub-badge" class="badge badge-muted">Loading…</span>
+      <span id="sub-badge" class="badge badge-muted">Loading...</span>
     </div>
   </div>
 
@@ -69,14 +69,14 @@
   <section class="card" style="margin-top:24px;">
     <h2 style="font-size:1.1rem;margin-top:0;">Quick links</h2>
     <p style="color:var(--muted);font-size:0.92rem;">
-      <a href="generate.html">Open document generator →</a><br>
+      <a href="generate.html">Open document generator -></a><br>
       Default freelancer details can be saved here in a future update.
     </p>
   </section>
 </main>
 
 <footer>
-  <p><span class="logo"><span class="logo-mark"></span>novo</span> · © 2026</p>
+  <p><span class="logo"><span class="logo-mark"></span>novo</span> - (c) 2026</p>
 </footer>
 
 <script src="js/api.js"></script>
@@ -101,7 +101,7 @@ async function loadProfile() {
   const planActions = document.getElementById('plan-actions');
 
   if (currentUser.role === 'admin') {
-    badge.textContent = 'Admin — full access';
+    badge.textContent = 'Admin - full access';
     badge.className = 'badge badge-ok';
     details.textContent = 'Admin accounts have unlimited access to all features.';
     planActions.style.display = 'none';
@@ -110,8 +110,8 @@ async function loadProfile() {
     badge.className = 'badge badge-ok';
     const exp = currentUser.subscription.expiresAt
       ? new Date(currentUser.subscription.expiresAt).toLocaleDateString()
-      : '—';
-    details.textContent = `${currentUser.subscription.plan || 'Active'} plan · Renews/expires ${exp}`;
+      : '-';
+    details.textContent = `${currentUser.subscription.plan || 'Active'} plan - Renews/expires ${exp}`;
     cancelBtn.style.display = '';
     planActions.style.display = 'none';
   } else {
@@ -151,7 +151,7 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
 
 document.querySelectorAll('[data-plan]').forEach(btn => {
   btn.addEventListener('click', async () => {
-    if (!confirm(`Activate ${btn.dataset.plan} subscription? (Demo mode — wire Stripe for production payments.)`)) return;
+    if (!confirm(`Activate ${btn.dataset.plan} subscription? (Demo mode - wire Stripe for production payments.)`)) return;
     try {
       await window.novoApi.activateSubscription(btn.dataset.plan);
       const { user } = await window.novoApi.me();

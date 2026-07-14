@@ -1,5 +1,5 @@
 function fmtMoney(amount, currency) {
-  const symbols = { USD: '$', EUR: '€', GBP: '£', KZT: '₸' };
+  const symbols = { USD: '$', EUR: 'EUR', GBP: 'GBP', KZT: 'KZT' };
   const s = symbols[currency] || currency + ' ';
   return `${s}${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 }
@@ -204,7 +204,7 @@ function buildProposal(d) {
     blocks: [
       { heading: null, body:
         `Prepared for: ${d.clientName}\nBy: ${d.freelancerName}${d.freelancerEmail ? ' (' + d.freelancerEmail + ')' : ''}\nDate: ${d.startDate || '[Date]'}` },
-      { heading: 'Overview', body: `Proposal for "${d.projectName}" — scope, timeline, and investment.` },
+      { heading: 'Overview', body: `Proposal for "${d.projectName}" - scope, timeline, and investment.` },
       { heading: 'Scope', body: d.scope || 'Defined during discovery.' },
       { heading: 'Timeline', body:
         `Start: ${d.startDate || '[Start]'}` + (d.endDate ? `\nCompletion: ${d.endDate}` : '') +

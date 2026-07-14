@@ -2,16 +2,18 @@
   "name": "novo",
   "version": "2.0.0",
   "private": true,
-  "description": "novo — freelance document generator with auth & subscriptions",
+  "description": "novo - freelance document generator with auth and subscriptions",
   "scripts": {
-    "install:all": "npm install --prefix backend",
+    "install:all": "npm install && npm install --prefix backend",
     "init-db": "npm run init-db --prefix backend",
     "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npx --yes serve frontend -l 3000",
-    "dev": "npm run install:all && npm run init-db && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "start": "npm run init-db --prefix backend && NODE_ENV=production npm start --prefix backend"
+    "dev:frontend": "serve frontend -l 3000",
+    "dev": "npm run init-db && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start": "npm run init-db --prefix backend && cross-env NODE_ENV=production npm start --prefix backend"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "serve": "^14.2.4"
   }
 }

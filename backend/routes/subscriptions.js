@@ -18,7 +18,7 @@ router.get('/status', authRequired, (req, res) => {
   res.json({ subscription: sanitizeUser(req.user).subscription, hasActive: sanitizeUser(req.user).hasActiveSubscription });
 });
 
-// Dev/demo activation — in production, wire to Stripe Checkout + webhooks
+// Dev/demo activation - in production, wire to Stripe Checkout + webhooks
 router.post('/activate', authRequired, (req, res) => {
   const { plan } = req.body || {};
   if (!PLANS[plan]) {

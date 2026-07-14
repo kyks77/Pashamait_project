@@ -1,7 +1,7 @@
 {
   "name": "novo-backend",
   "version": "1.0.0",
-  "description": "novo API — auth, subscriptions, admin",
+  "description": "novo API - auth, subscriptions, admin",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

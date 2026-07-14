@@ -16,13 +16,13 @@
     try {
       await window.novoApi.checkGenerateAccess();
       state.hasAccess = true;
-      showStatus('Subscription active — watermark-free PDFs', 'ok');
+      showStatus('Subscription active - watermark-free PDFs', 'ok');
     } catch (err) {
       state.hasAccess = false;
       if (err.status === 402) {
         showStatus('Subscribe to generate watermark-free documents', 'warn');
       } else {
-        showStatus('Preview mode — subscribe for full access', 'warn');
+        showStatus('Preview mode - subscribe for full access', 'warn');
       }
     }
   }
@@ -30,7 +30,7 @@
   function showStatus(msg, type) {
     if (!statusBar) return;
     statusBar.innerHTML = `<span class="status-${type}">${msg}</span>` +
-      (state.hasAccess ? '' : ' <a href="profile.html#subscribe">View plans →</a>');
+      (state.hasAccess ? '' : ' <a href="profile.html#subscribe">View plans -></a>');
   }
 
   paymentSelect?.addEventListener('change', () => {
@@ -85,7 +85,7 @@
       pdf.saveGraphicsState();
       pdf.setTextColor(235, 232, 226);
       pdf.setFontSize(52);
-      pdf.text('novo — preview', pageWidth / 2, pageHeight / 2, { align: 'center', angle: 35 });
+      pdf.text('novo - preview', pageWidth / 2, pageHeight / 2, { align: 'center', angle: 35 });
       pdf.restoreGraphicsState();
     }
 

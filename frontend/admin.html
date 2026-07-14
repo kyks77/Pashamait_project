@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — novo</title>
+<title>Admin - novo</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,9 +18,9 @@
   <p style="color:var(--muted);">Monitor users, subscriptions, and halt suspicious activity.</p>
 
   <div class="admin-stats" id="stats">
-    <div class="stat-card"><div class="num" id="stat-users">—</div><div class="label">Total users</div></div>
-    <div class="stat-card"><div class="num" id="stat-subs">—</div><div class="label">Active subscriptions</div></div>
-    <div class="stat-card"><div class="num" id="stat-suspended">—</div><div class="label">Suspended</div></div>
+    <div class="stat-card"><div class="num" id="stat-users">-</div><div class="label">Total users</div></div>
+    <div class="stat-card"><div class="num" id="stat-subs">-</div><div class="label">Active subscriptions</div></div>
+    <div class="stat-card"><div class="num" id="stat-suspended">-</div><div class="label">Suspended</div></div>
   </div>
 
   <section class="card" style="margin-bottom:24px;">
@@ -61,7 +61,7 @@
 </main>
 
 <footer>
-  <p><span class="logo"><span class="logo-mark"></span>novo</span> · Admin</p>
+  <p><span class="logo"><span class="logo-mark"></span>novo</span> - Admin</p>
 </footer>
 
 <script src="js/api.js"></script>
@@ -92,7 +92,7 @@ async function loadDashboard() {
   tbody.innerHTML = usersData.users.map(u => `
     <tr>
       <td>${escapeHtml(u.email)}</td>
-      <td>${escapeHtml(u.displayName || '—')}</td>
+      <td>${escapeHtml(u.displayName || '-')}</td>
       <td><span class="badge ${u.status === 'active' ? 'badge-ok' : 'badge-warn'}">${u.status}</span></td>
       <td>${u.subscription.status}${u.subscription.plan ? ' (' + u.subscription.plan + ')' : ''}</td>
       <td class="action-btns">
@@ -116,10 +116,10 @@ async function loadDashboard() {
   document.getElementById('activity-table').innerHTML = activityData.activity.map(a => `
     <tr>
       <td>${new Date(a.created_at).toLocaleString()}</td>
-      <td>${escapeHtml(a.email || a.user_id || '—')}</td>
+      <td>${escapeHtml(a.email || a.user_id || '-')}</td>
       <td>${escapeHtml(a.action)}</td>
-      <td>${escapeHtml(a.details || '—')}</td>
-      <td>${escapeHtml(a.ip_address || '—')}</td>
+      <td>${escapeHtml(a.details || '-')}</td>
+      <td>${escapeHtml(a.ip_address || '-')}</td>
     </tr>
   `).join('');
 }
